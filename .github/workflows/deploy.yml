@@ -1,0 +1,54 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment"
+        required: true
+        type: choice
+        options: [dev, staging, prod]
+      strategy:
+        description: "Deploy strategy"
+        required: true
+        type: choice
+        options: [rolling, recreate, canary]
+      ref_type:
+        description: "branch or tag"
+        required: true
+        type: choice
+        options: [branch, tag]
+      ref_name:
+        description: "Branch name or tag"
+        required: true
+        type: string
+      release_id:
+        description: "MAMS release id"
+        required: true
+        type: string
+      mams_callback_url:
+        description: "MAMS callback URL"
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Simulate deploy
+        run: |
+          echo "environment=${{ inputs.environment }}"
+          echo "strategy=${{ inputs.strategy }}"
+          echo "ref_type=${{ inputs.ref_type }}"
+          echo "ref_name=${{ inputs.ref_name }}"
+          sleep 5
+
+      - name: Callback success to MAMS
+        env:
+          RELEASE_ID: ${{ inputs.release_id }}
+          CALLBACK_URL: ${{ inputs.mams_callback_url }}
+        run: |
+          curl -sS -X POST "$CALLBACK_URL" \
+            -H "Content-Type: application/json" \
+            -d "{\"release_id\":\"$RELEASE_ID\",\"status\":\"success\"}"
+
