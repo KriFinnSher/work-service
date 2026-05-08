@@ -69,14 +69,23 @@ jobs:
           echo "Image pushed: ghcr.io/${{ env.REPO_LOWER }}:${{ inputs.ref_name }}"
           echo "Deploying to ${{ inputs.environment }} with strategy ${{ inputs.strategy }}"
           sleep 3
-          echo "Deployment completed!"
 
-      - name: Callback to MAMS (optional)
-        if: inputs.mams_callback_url != ''
+      - name: Callback to MAMS (success)
+        if: success() && inputs.mams_callback_url != ''
         env:
           RELEASE_ID: ${{ inputs.release_id }}
           CALLBACK_URL: ${{ inputs.mams_callback_url }}
         run: |
           curl -sS -X POST "$CALLBACK_URL" \
             -H "Content-Type: application/json" \
-            -d "{\"release_id\":\"$RELEASE_ID\",\"status\":\"success\"}" || echo "Callback failed, ignoring..."
+            -d "{\"release_id\":\"$RELEASE_ID\",\"status\":\"success\"}"
+
+      - name: Callback to MAMS (failure)
+        if: failure() && inputs.mams_callback_url != ''
+        env:
+          RELEASE_ID: ${{ inputs.release_id }}
+          CALLBACK_URL: ${{ inputs.mams_callback_url }}
+        run: |
+          curl -sS -X POST "$CALLBACK_URL" \
+            -H "Content-Type: application/json" \
+            -d "{\"release_id\":\"$RELEASE_ID\",\"status\":\"failed\"}"
