@@ -50,18 +50,23 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Get lowercase registry path
+        run: |
+          REGISTRY_PATH=$(echo "${{ github.actor }}/work-service" | tr '[:upper:]' '[:lower:]')
+          echo "REGISTRY_PATH=$REGISTRY_PATH" >> $GITHUB_ENV
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.actor }}/work-service:${{ inputs.ref_name }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.actor }}/work-service:latest
+          tags: ghcr.io/${{ env.REGISTRY_PATH }}:${{ inputs.ref_name }}
+          cache-from: type=registry,ref=ghcr.io/${{ env.REGISTRY_PATH }}:latest
           cache-to: type=inline
 
       - name: Simulate deployment
         run: |
-          echo "Image pushed: ghcr.io/${{ github.actor }}/work-service:${{ inputs.ref_name }}"
+          echo "Image pushed: ghcr.io/${{ env.REGISTRY_PATH }}:${{ inputs.ref_name }}"
           echo "Deploying to ${{ inputs.environment }} with strategy ${{ inputs.strategy }}"
           sleep 3
 
