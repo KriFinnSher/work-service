@@ -106,6 +106,7 @@ func main() {
 			w.Write([]byte("ok v3"))
 		})
 		mux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+			log.Printf("[WARN] test endpoint called from %s", r.RemoteAddr)
 			_, _ = (&server{}).GetUser(context.Background(), &gen.GetUserRequest{
 				Id: "123",
 			})
