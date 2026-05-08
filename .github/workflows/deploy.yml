@@ -26,10 +26,6 @@ on:
         description: "MAMS release id"
         required: true
         type: string
-      mams_callback_url:
-        description: "MAMS callback URL (optional)"
-        required: false
-        type: string
 
 jobs:
   deploy:
@@ -63,23 +59,4 @@ jobs:
           echo "Image pushed: docker.io/vaverinov/work-service:${{ inputs.ref_name }}"
           echo "Deploying to ${{ inputs.environment }} with strategy ${{ inputs.strategy }}"
           sleep 3
-
-      - name: Callback to MAMS (success)
-        if: success() && inputs.mams_callback_url != ''
-        env:
-          RELEASE_ID: ${{ inputs.release_id }}
-          CALLBACK_URL: ${{ inputs.mams_callback_url }}
-        run: |
-          curl -sS -X POST "$CALLBACK_URL" \
-            -H "Content-Type: application/json" \
-            -d "{\"release_id\":\"$RELEASE_ID\",\"status\":\"success\"}"
-
-      - name: Callback to MAMS (failure)
-        if: failure() && inputs.mams_callback_url != ''
-        env:
-          RELEASE_ID: ${{ inputs.release_id }}
-          CALLBACK_URL: ${{ inputs.mams_callback_url }}
-        run: |
-          curl -sS -X POST "$CALLBACK_URL" \
-            -H "Content-Type: application/json" \
-            -d "{\"release_id\":\"$RELEASE_ID\",\"status\":\"failed\"}"
+          echo "Deployment completed!"
