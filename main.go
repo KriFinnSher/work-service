@@ -105,6 +105,12 @@ func main() {
 			log.Printf("[INFO] healthz endpoint called from %s", r.RemoteAddr)
 			w.Write([]byte("ok v3"))
 		})
+		mux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+			_, _ = (&server{}).GetUser(context.Background(), &gen.GetUserRequest{
+				Id: "123",
+			})
+			w.Write([]byte("ok"))
+		})
 		mux.Handle("/metrics", promhttp.Handler())
 		log.Printf("HTTP server listening on :%s", httpPort)
 		if err := http.ListenAndServe(":"+httpPort, mux); err != nil {
