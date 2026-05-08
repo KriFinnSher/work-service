@@ -50,13 +50,13 @@ jobs:
         with:
           context: .
           push: true
-          tags: docker.io/vaverinov/work-service:${{ inputs.ref_name }}
+          tags: docker.io/vaverinov/work-service:${{ github.sha }}
           cache-from: type=registry,ref=docker.io/vaverinov/work-service:latest
           cache-to: type=inline
 
       - name: Simulate deployment
         run: |
-          echo "Image pushed: docker.io/vaverinov/work-service:${{ inputs.ref_name }}"
+          echo "Image pushed: docker.io/vaverinov/work-service:${{ github.sha }}"
           echo "Deploying to ${{ inputs.environment }} with strategy ${{ inputs.strategy }}"
           sleep 3
           echo "Deployment completed!"
