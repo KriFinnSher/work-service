@@ -27,28 +27,32 @@ on:
         required: true
         type: string
       mams_callback_url:
-        description: "MAMS callback URL"
-        required: true
+        description: "MAMS callback URL (optional)"
+        required: false
         type: string
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Simulate deploy
         run: |
-          echo "environment=${{ inputs.environment }}"
-          echo "strategy=${{ inputs.strategy }}"
-          echo "ref_type=${{ inputs.ref_type }}"
-          echo "ref_name=${{ inputs.ref_name }}"
+          echo "Deploying to ${{ inputs.environment }}..."
+          echo "Strategy: ${{ inputs.strategy }}"
+          echo "Ref: ${{ inputs.ref_type }}/${{ inputs.ref_name }}"
+          echo "Release ID: ${{ inputs.release_id }}"
           sleep 5
+          echo "Deploy completed successfully!"
 
-      - name: Callback success to MAMS
+      - name: Callback to MAMS (optional)
+        if: inputs.mams_callback_url != ''
         env:
           RELEASE_ID: ${{ inputs.release_id }}
           CALLBACK_URL: ${{ inputs.mams_callback_url }}
         run: |
           curl -sS -X POST "$CALLBACK_URL" \
             -H "Content-Type: application/json" \
-            -d "{\"release_id\":\"$RELEASE_ID\",\"status\":\"success\"}"
-
+            -d "{\"release_id\":\"$RELEASE_ID\",\"status\":\"success\"}" || echo "Callback failed, ignoring..."
