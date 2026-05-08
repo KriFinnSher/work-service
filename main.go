@@ -102,7 +102,7 @@ func main() {
 	go func() {
 		mux := http.NewServeMux()
 		mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("ok v2"))
+			w.Write([]byte("ok v3"))
 		})
 		mux.Handle("/metrics", promhttp.Handler())
 		log.Printf("HTTP server listening on :%s", httpPort)
