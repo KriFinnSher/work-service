@@ -102,7 +102,7 @@ func main() {
 	go func() {
 		mux := http.NewServeMux()
 		mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-			log.Printf("[ERROR] healthz endpoint called from %s", r.RemoteAddr)
+			log.Printf("[INFO] healthz endpoint called from %s", r.RemoteAddr)
 			w.Write([]byte("ok v3"))
 		})
 		mux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
